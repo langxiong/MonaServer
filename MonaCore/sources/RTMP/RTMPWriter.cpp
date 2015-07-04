@@ -39,9 +39,9 @@ void RTMPWriter::writeProtocolSettings() {
 	write(AMF::BANDWITH).packet.write32(2500000).write8(0); // hard setting
 }
 
-void RTMPWriter::flush() {
+bool RTMPWriter::flush() {
 	if(!_pSender || !_pSender->available())
-		return;
+		return false;
 	Exception ex;
 	if (_pEncryptKey) {
 		_pSender->dump(true, _channel,_session.peer.address);
@@ -52,6 +52,7 @@ void RTMPWriter::flush() {
 		
 	
 	_pSender.reset(); // release the shared buffer (poolBuffer of AMWriter)
+	return true;
 }
 
 
@@ -85,22 +86,24 @@ AMFWriter& RTMPWriter::write(AMF::ContentType type,UInt32 time,const UInt8* data
 	UInt32 absoluteTime = time;
 	UInt8 headerFlag=0;
 	
-	if (time >= _channel.absoluteTime) {
-		if(_channel.pStream == channel.pStream) {
-			++headerFlag;
+	// Default = Chunk Message Type 0 : full header
+	if(_channel.pStream == channel.pStream) {
+		if (time >= _channel.absoluteTime) {
+			++headerFlag; // Chunk Message Type 1 : don't repeat the stream id
 			time -= _channel.absoluteTime; // relative time!
 			if (_channel.type == type && data && _channel.bodySize == size) {
-				++headerFlag;
-				if (_channel.time==time)
-					++headerFlag;
+				++headerFlag; // Chunk Message Type 2 : just timestamp delta
+				if (_channel.time == time)
+					++headerFlag; // Chunk Message Type 3 : no header
 			}
-		} else
-			_channel.pStream=channel.pStream;
-	} // else time<_channel.absoluteTime => header must be full
+		}  // else time<_channel.absoluteTime => header must be full, because can't be relative!
+	} else
+		_channel.pStream=channel.pStream;
 
 	_channel.absoluteTime =	absoluteTime;
 	_channel.time = time;
 	_channel.type = type;
+	_channel.bodySize = size;
 
 	if (!_pSender)
 		_pSender.reset(new RTMPSender(_session.invoker.poolBuffers));
@@ -124,12 +127,7 @@ AMFWriter& RTMPWriter::write(AMF::ContentType type,UInt32 time,const UInt8* data
 
 
 	if (_pSender->headerSize > 0) {
-		if (time<0xFFFFFF)
-			packet.write24(time);
-		else {
-			packet.write24(0xFFFFFF);
-			_pSender->headerSize += 4;
-		}
+		packet.write24(time<0xFFFFFF ? time : 0xFFFFFF);
 
 		if (_pSender->headerSize > 4) {
 			_pSender->sizePos = packet.size();
@@ -143,10 +141,12 @@ AMFWriter& RTMPWriter::write(AMF::ContentType type,UInt32 time,const UInt8* data
 				packet.write8(streamId >> 24);
 				// if(type==AMF::DATA_AMF3) TODO?
 				//	pWriter->write8(0);
-				if (_pSender->headerSize > 12)
-					packet.write32(time);
 			}
 		}
+	}
+	if (time >= 0xFFFFFF) {
+		packet.write32(time);
+		_pSender->headerSize += 4;
 	}
 
 	if(data) {

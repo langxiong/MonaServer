@@ -29,7 +29,7 @@ using namespace std;
 namespace Mona {
 
 
-RTMPSession::RTMPSession(const SocketAddress& peerAddress, SocketFile& file, Protocol& protocol, Invoker& invoker) : _mainStream(invoker,peer),_unackBytes(0),_decrypted(0), _chunkSize(RTMP::DEFAULT_CHUNKSIZE), _winAckSize(RTMP::DEFAULT_WIN_ACKSIZE),_handshaking(0), _pWriter(NULL), TCPSession(peerAddress,file, protocol, invoker),_isRelative(true),
+RTMPSession::RTMPSession(const SocketAddress& peerAddress, SocketFile& file, Protocol& protocol, Invoker& invoker) : _mainStream(invoker,peer),_unackBytes(0),_decrypted(0), _chunkSize(RTMP::DEFAULT_CHUNKSIZE), _winAckSize(RTMP::DEFAULT_WIN_ACKSIZE),_handshaking(0), _pWriter(NULL), TCPSession(peerAddress,file, protocol, invoker),
 		onStreamStart([this](UInt16 id, FlashWriter& writer) {
 			// Stream Begin signal
 			(_pController ? (FlashWriter&)*_pController : writer).writeRaw().write16(0).write32(id);
@@ -160,65 +160,61 @@ bool RTMPSession::buildPacket(BinaryReader& packet) {
 	if(headerSize==0)
 		headerSize=1;
 
+	// if idWriter==0 id is encoded on the following byte, if idWriter==1 id is encoded on the both following byte
 	if (idWriter < 2)
-		++headerSize;
-	if (idWriter < 1)
-		++headerSize;
-
+		headerSize += idWriter+1;
 
 	if (packet.available() < headerSize) // want read in first the header!
 		return false;
 
-	if (idWriter < 2) {
-		idWriter = packet.read8() + 64; // second bytes + 64
-		if (idWriter < 1)
-			idWriter += packet.read8()*256; // third bytes*256
-	}
-
-	RTMPWriter* pWriter(NULL);
+	if (idWriter < 2)
+		idWriter = (idWriter==0 ? packet.read8() : packet.read16()) + 64;
+		
+	RTMPWriter* pWriter;
 	if (idWriter != 2) {
 		MAP_FIND_OR_EMPLACE(_writers, it, idWriter, idWriter,*this,_pSender, pEncryptKey());
 		pWriter = &it->second;
-	}
-	if (!pWriter)
+	} else
 		pWriter = _pController.get();
 
 
 	RTMPChannel& channel(pWriter->channel);
-	_isRelative = true;
+	bool isRelative(true);
 	if(headerSize>=4) {
 		
 		// TIME
 		channel.time = packet.read24();
+
 		if(headerSize>=8) {
 			// SIZE
 			channel.bodySize = packet.read24();
 			// TYPE
 			channel.type = (AMF::ContentType)packet.read8();
 			if(headerSize>=12) {
-				_isRelative = false;
+				isRelative = false;
 				// STREAM
 				UInt32 streamId(packet.read8());
 				streamId += packet.read8() << 8;
 				streamId += packet.read8() << 16;
 				streamId += packet.read8() << 24;
 				if (!_mainStream.getStream(streamId, channel.pStream) && streamId) {
-					ERROR("RTMPSession ",name()," indicates a non-existent ",streamId," NetStream");
+					ERROR("RTMPSession ",name()," indicates a non-existent ",streamId," FlashStream");
 					kill(PROTOCOL_DEATH);
 					return false;
 				}
 
 			}
 		}
+	}
 
-		// extended timestamp
-		if (channel.time >= 0xFFFFFF) {
-			headerSize += 4;
-			if (packet.available() < 4)
-				return false;
-			channel.time = packet.read32();
-		}
-
+	// extended timestamp (can be present for headerSize=1!)
+	bool wasExtendedTime(false);
+	if (channel.time >= 0xFFFFFF) {
+		headerSize += 4;
+		if (packet.available() < 4)
+			return false;
+		channel.time = packet.read32();
+		wasExtendedTime = true;
 	}
 
   //  TRACE("Writer ",pWriter->id," absolute time ",channel.absoluteTime)
@@ -230,8 +226,18 @@ bool RTMPSession::buildPacket(BinaryReader& packet) {
 	if(total>_chunkSize)
 		total = _chunkSize;
 
-	if (packet.available()<total)
+	if (packet.available() < total)
 		return false;
+
+	//// resolve absolute time on new packet!
+	if (channel.pBuffer.empty()) {
+		if (isRelative)
+			channel.absoluteTime += channel.time; // relative
+		else
+			channel.absoluteTime = channel.time; // absolute
+	}
+	if (wasExtendedTime) // reset channel.time
+		channel.time = 0xFFFFFF;
 
 	//// data consumed now!
 	packet.shrink(total);
@@ -286,16 +292,7 @@ void RTMPSession::receive(BinaryReader& packet) {
 		return; // wait the next piece
 	}
 
-	if (_isRelative)
-		channel.absoluteTime += channel.time;
-	else
-		channel.absoluteTime = channel.time;
-
 	PacketReader reader(channel.pBuffer.empty() ? packet.current() : channel.pBuffer->data(),channel.bodySize);
-
-	// To fix payload position: for this both type, it seems that we have an useless header byte
-	if (channel.type == AMF::INVOCATION_AMF3 || channel.type == AMF::DATA_AMF3)
-		reader.next(1);
 
 	switch(channel.type) {
 		case AMF::ABORT:
@@ -310,6 +307,10 @@ void RTMPSession::receive(BinaryReader& packet) {
 			break;
 		case AMF::WIN_ACKSIZE:
 			_winAckSize = reader.read32();
+			break;
+		case AMF::ACK:
+			// nothing to do, a ack message says about how many bytes have been gotten by the peer
+			// RTMFP has a complexe ack mechanism and RTMP is TCP based, ack mechanism is in system layer => so useless
 			break;
 		default: {
 			if (!channel.pStream) {

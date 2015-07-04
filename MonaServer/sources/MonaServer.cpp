@@ -610,14 +610,14 @@ bool MonaServer::onMessage(Exception& ex, Client& client,const string& name,Data
 			if(SCRIPT_FUNCTION_ERROR)
 				ex.set(Exception::SOFTWARE,SCRIPT_FUNCTION_ERROR);
 			else if (SCRIPT_READ_AVAILABLE)
-				SCRIPT_READ_NEXT(ScriptReader(_pState, SCRIPT_READ_NEXT(SCRIPT_READ_AVAILABLE)).read(client.writer().writeResponse(responseType)));
+				SCRIPT_READ_NEXT(ScriptReader(_pState, SCRIPT_READ_AVAILABLE).read(client.writer().writeResponse(responseType)));
 		SCRIPT_FUNCTION_END
 		
 	SCRIPT_END
 	return found;
 }
 
-bool MonaServer::onFileAccess(Exception& ex, Client& client, Client::FileAccessType type, Path& filePath,DataReader& parameters,DataWriter& properties) { 
+bool MonaServer::onFileAccess(Exception& ex, Client& client, Client::FileAccessType type, DataReader& parameters, Path& filePath, DataWriter& properties) { 
 
 	if (filePath.isFolder()) {
 		// filePath must be a file, not a folder, otherwise it's a security issue
@@ -744,10 +744,13 @@ bool MonaServer::onSubscribe(Exception& ex, Client& client,const Listener& liste
 		SCRIPT_FUNCTION_END
 	SCRIPT_END
 	if (!result) {
-		LUAPublication::RemoveListener(_pState, listener.publication);
-		Script::ClearObject<LUAListener>(_pState, listener);
-		if (!listener.publication.running() && listener.publication.listeners.count() == 0)
-			Script::ClearObject<LUAPublication>(_pState, listener.publication);
+		if (Script::FromObject<Client>(_pState, client)) {
+			LUAPublication::RemoveListener(_pState, listener.publication);
+			Script::ClearObject<LUAListener>(_pState, listener);
+			if (!listener.publication.running() && listener.publication.listeners.count() == 0)
+				Script::ClearObject<LUAPublication>(_pState, listener.publication);
+			lua_pop(_pState, 1);
+		}
 	} else if (!done && Script::FromObject<Client>(_pState, client)) {
 		LUAPublication::AddListener(_pState, 2, 1);
 		lua_pop(_pState, 1);
@@ -760,7 +763,6 @@ void MonaServer::onUnsubscribe(Client& client,const Listener& listener) {
 	bool done(false);
 	SCRIPT_BEGIN(_pState)
 		SCRIPT_MEMBER_FUNCTION_BEGIN(Client, client,"onUnsubscribe")
-			Script::AddObject<LUAListener>(_pState, listener);
 			LUAPublication::RemoveListener(_pState, listener.publication);
 			done = true;
 			SCRIPT_FUNCTION_CALL
@@ -769,7 +771,7 @@ void MonaServer::onUnsubscribe(Client& client,const Listener& listener) {
 
 	if (!listener.publication.running() && listener.publication.listeners.count() == 0)
 		Script::ClearObject<LUAPublication>(_pState, listener.publication);
-	else if (!done && Script::FromObject<Listener>(_pState, listener)) {
+	else if (!done && Script::FromObject<Client>(_pState, client)) {
 		LUAPublication::RemoveListener(_pState, listener.publication);
 		lua_pop(_pState, 1);
 	}

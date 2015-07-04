@@ -33,17 +33,17 @@ using namespace Mona;
 void LUAPublication::AddListener(lua_State* pState, UInt8 indexPublication, UInt8 indexListener) {
 	// -1 must be the client table!
 	Script::Collection(pState, indexPublication, "listeners");
+	lua_pushvalue(pState, -2); // client table
 	lua_pushvalue(pState, indexListener);
-	lua_pushvalue(pState, -4); // client table
 	Script::FillCollection(pState, 1);
 	lua_pop(pState, 1);
 }
 
 void LUAPublication::RemoveListener(lua_State* pState, const Publication& publication) {
-	// -1 must be the listener table!
+	// -1 must be the client table!
 	if (Script::FromObject<Publication>(pState, publication)) {
 		Script::Collection(pState, -1, "listeners");
-		lua_pushvalue(pState, -3); // listener table
+		lua_pushvalue(pState, -3); // client table
 		lua_pushnil(pState);
 		Script::FillCollection(pState, 1);
 		lua_pop(pState, 2);
@@ -156,6 +156,8 @@ int LUAPublication::Get(lua_State *pState) {
 				SCRIPT_CALLBACK_FIX_INDEX
 			} else if(strcmp(name,"lastTime")==0) {
 				SCRIPT_WRITE_NUMBER(publication.lastTime()) // can change
+			} else if(strcmp(name,"droppedFrames")==0) {
+				SCRIPT_WRITE_NUMBER(publication.droppedFrames()) // can change
 			} else if(strcmp(name,"listeners")==0) {
 				Script::Collection(pState, 1, "listeners");
 				SCRIPT_CALLBACK_FIX_INDEX

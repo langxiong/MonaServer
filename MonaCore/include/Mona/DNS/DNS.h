@@ -1,7 +1,6 @@
 /*
 Copyright 2014 Mona
-mathieu.poux[a]gmail.com
-jammetthomas[a]gmail.com
+lang.xiong.sc[a]gmail.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,23 +16,21 @@ details (or else see http://www.gnu.org/licenses/).
 This file is a part of Mona.
 */
 
-#include "Mona/Protocols.h"
+#pragma once
 
-#include "Mona/RTMP/RTMProtocol.h"
-#include "Mona/RTMFP/RTMFProtocol.h"
-#include "Mona/HTTP/HTTProtocol.h"
-#include "Mona/RTSP/RTSProtocol.h"
-#include "Mona/DNS/DNSProtocol.h"
+#include "Mona/Mona.h"
+#include "Mona/SocketAddress.h"
+#include "Mona/BinaryReader.h"
+#include "Mona/BinaryWriter.h"
+#include "Mona/Time.h"
+#include <openssl/evp.h>
 
 namespace Mona {
-	
-void Protocols::load(Sessions& sessions) {
-	loadProtocol<RTMFProtocol>("RTMFP", 1935, sessions);
-	loadProtocol<RTMProtocol>("RTMP", 1935, sessions);
-	loadProtocol<HTTProtocol>("HTTP", 80, sessions);
-	loadProtocol<RTSProtocol>("RTSP", 554, sessions);
-    loadProtocol<DNSProtocol>("DNS", 53, sessions);
-}
 
+class DNS : virtual Static {
+public:
+    static bool	Unpack(BinaryReader& reader);
+    static void	Pack(BinaryWriter& writer);
+};
 
-} // namespace Mona
+}  // namespace Mona

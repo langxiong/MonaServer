@@ -37,6 +37,9 @@
     <Filter Include="Protocols\RTSP">
       <UniqueIdentifier>{5cb6a196-c994-4951-821c-7c54141ff68c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocols\DNS">
+      <UniqueIdentifier>{e947b244-416c-4700-aa40-4bfb7cf75c4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Mona\Protocol.h">
@@ -269,6 +272,15 @@
     <ClInclude Include="include\Mona\RTSP\RTSPSender.h">
       <Filter>Protocols\RTSP</Filter>
     </ClInclude>
+    <ClInclude Include="include\Mona\DNS\DNSProtocol.h">
+      <Filter>Protocols\DNS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mona\DNS\DNS.h">
+      <Filter>Protocols\DNS</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mona\DNS\DNSSession.h">
+      <Filter>Protocols\DNS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sources\Protocols.cpp">
@@ -436,6 +448,15 @@
     </ClCompile>
     <ClCompile Include="sources\RTSP\RTSPWriter.cpp">
       <Filter>Protocols\RTSP</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\DNS\DNSProtocol.cpp">
+      <Filter>Protocols\DNS</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\DNS\DNS.cpp">
+      <Filter>Protocols\DNS</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\DNS\DNSSession.cpp">
+      <Filter>Protocols\DNS</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

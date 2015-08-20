@@ -208,6 +208,9 @@
   <ItemGroup>
     <ClInclude Include="include\Mona\Client.h" />
     <ClInclude Include="include\Mona\Decoder.h" />
+    <ClInclude Include="include\Mona\DNS\DNS.h" />
+    <ClInclude Include="include\Mona\DNS\DNSProtocol.h" />
+    <ClInclude Include="include\Mona\DNS\DNSSession.h" />
     <ClInclude Include="include\Mona\FlashMainStream.h" />
     <ClInclude Include="include\Mona\Group.h" />
     <ClInclude Include="include\Mona\Handler.h" />
@@ -290,6 +293,9 @@
     <ClInclude Include="include\Mona\XMLRPCWriter.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="sources\DNS\DNS.cpp" />
+    <ClCompile Include="sources\DNS\DNSProtocol.cpp" />
+    <ClCompile Include="sources\DNS\DNSSession.cpp" />
     <ClCompile Include="sources\FlashMainStream.cpp" />
     <ClCompile Include="sources\HTTP\HTTPDecoder.cpp" />
     <ClCompile Include="sources\HTTP\HTTPPacket.cpp" />

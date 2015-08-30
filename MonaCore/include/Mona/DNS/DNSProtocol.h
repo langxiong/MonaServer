@@ -23,15 +23,18 @@ This file is a part of Mona.
 
 namespace Mona {
 
+class DNSHelper;
 class DNSProtocol : public UDProtocol, public virtual Object  {
 public:
 	DNSProtocol(const char* name, Invoker& invoker, Sessions& sessions);
     ~DNSProtocol();
 	
-	bool		load(Exception& ex,const SocketAddress& address);
+	bool        load(Exception& ex,const SocketAddress& address);
 private:
 	void		manage() {; }
+private:
 	UDProtocol::OnPacket::Type onPacket;
+    std::unique_ptr<DNSHelper>	_pDNSHelper;;
 };
 
 

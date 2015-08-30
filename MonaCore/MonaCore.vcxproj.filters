@@ -40,6 +40,9 @@
     <Filter Include="Protocols\DNS">
       <UniqueIdentifier>{e947b244-416c-4700-aa40-4bfb7cf75c4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocols\Proxy">
+      <UniqueIdentifier>{f382cc36-6f60-45cd-ad8f-fea1410cc272}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Mona\Protocol.h">
@@ -281,6 +284,9 @@
     <ClInclude Include="include\Mona\DNS\DNSSession.h">
       <Filter>Protocols\DNS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Mona\DNS\DNSHelper.h">
+      <Filter>Protocols\DNS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sources\Protocols.cpp">
@@ -456,6 +462,9 @@
       <Filter>Protocols\DNS</Filter>
     </ClCompile>
     <ClCompile Include="sources\DNS\DNSSession.cpp">
+      <Filter>Protocols\DNS</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\DNS\DNSHelper.cpp">
       <Filter>Protocols\DNS</Filter>
     </ClCompile>
   </ItemGroup>

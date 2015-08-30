@@ -1,6 +1,7 @@
 /*
 Copyright 2014 Mona
-lang.xiong.sc[a]gmail.com
+mathieu.poux[a]gmail.com
+jammetthomas[a]gmail.com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,22 +20,21 @@ This file is a part of Mona.
 #pragma once
 
 #include "Mona/Mona.h"
-#include "Mona/SocketAddress.h"
-#include "Mona/BinaryReader.h"
-#include "Mona/BinaryWriter.h"
-#include "Mona/Time.h"
+#include "Mona/Decoder.h"
+#include "Mona/HTTP/HTTPPacket.h"
 
 namespace Mona {
 
-class DNS : virtual Static {
+class HTTPDecoder : public Decoder<const std::shared_ptr<HTTPPacket>>, public virtual Object {
 public:
-    static std::string GetHostFromPacket(const char* pBuf, size_t sz);
+	HTTPDecoder(Invoker& invoker) : _rootPath(invoker.rootPath()), Decoder(invoker, "HTTPDecoder") {}
 
-    static std::string GetResponseIPs(const char* pBuf, size_t sz);
+private:
+	UInt32 decoding(Exception& ex, UInt8* data,UInt32 size);
 
-    static bool FlushDNS();
+	const std::string&			_rootPath;
 
-    static bool NotifyIPChanged(const std::string& strAdapterName);
 };
 
-}  // namespace Mona
+
+} // namespace Mona

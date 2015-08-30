@@ -18,18 +18,132 @@ This file is a part of Mona.
 
 #include "Mona/DNS/DNS.h"
 #include "Mona/Crypto.h"
+#include "Mona/Logs.h"
+#include <WinSock2.h>
+#include <windows.h>
+#include <windns.h> 
 
 using namespace std;
+#pragma comment(lib, "Dnsapi.lib")
+
 namespace Mona {
 
-bool DNS::Unpack(BinaryReader& reader) {
-	reader.reset();
-    return false;
-}
+    typedef int (CALLBACK* DNSFLUSHPROC)();
+    typedef int (CALLBACK* DHCPNOTIFYPROC)(LPWSTR, LPWSTR, BOOL, DWORD, DWORD, DWORD, int);
 
-void DNS::Pack(BinaryWriter& writer) {
-	/*BinaryReader reader(writer.data()+4,writer.size()-4);
-	BinaryWriter(writer.data(),4).write32(reader.read32()^reader.read32()^farId);*/
-}
+    std::string DNS::GetHostFromPacket(const char* pBuf, size_t sz)
+    {
+        if (sz < sizeof(DNS_MESSAGE_BUFFER))
+        {
+            throw std::exception("invalid packet size.");
+        }
+
+        std::string host;
+        PDNS_MESSAGE_BUFFER pDNSMsgBuf = reinterpret_cast<PDNS_MESSAGE_BUFFER>(const_cast<char*>(pBuf));
+        if (pDNSMsgBuf->MessageBody)
+        {
+            int i = 0;
+            int count = pDNSMsgBuf->MessageBody[i++];
+            while (count--)
+            {
+                host.append(1, pDNSMsgBuf->MessageBody[i++]);
+            }
+            while ((count = pDNSMsgBuf->MessageBody[i++]) != 0)
+            {
+                host.append(1, '.');
+                while (count--)
+                {
+                    host.append(1, pDNSMsgBuf->MessageBody[i++]);
+                }
+            }
+            INFO("Query host ", host);
+        }
+        return host;
+    }
+
+    std::string DNS::GetResponseIPs(const char* pBuf, size_t sz)
+    {
+        if (sz < sizeof(DNS_MESSAGE_BUFFER))
+        {
+            throw std::exception("invalid packet size.");
+        }
+
+        std::string host;
+        PDNS_MESSAGE_BUFFER pDNSMsgBuf = reinterpret_cast<PDNS_MESSAGE_BUFFER>(const_cast<char*>(pBuf));
+        if (pDNSMsgBuf->MessageBody)
+        {
+            int i = 0;
+            int count = pDNSMsgBuf->MessageBody[i++];
+            while (count--)
+            {
+                host.append(1, pDNSMsgBuf->MessageBody[i++]);
+            }
+            while ((count = pDNSMsgBuf->MessageBody[i++]) != 0)
+            {
+                host.append(1, '.');
+                while (count--)
+                {
+                    host.append(1, pDNSMsgBuf->MessageBody[i++]);
+                }
+            }
+            INFO("Response host ", host);
+        }
+        PDNS_RECORD pRecord = NULL;
+        DNS_BYTE_FLIP_HEADER_COUNTS(&pDNSMsgBuf->MessageHead);
+        auto s = DnsExtractRecordsFromMessage_W(pDNSMsgBuf, sz, &pRecord);
+        if (pRecord)
+        {
+            PDNS_RECORD pRecordData = pRecord;
+            while (pRecordData)
+            {
+                if (std::string(pRecordData->pName) != ".")
+                {
+                    INFO("Response record ", pRecordData->pName);
+                }
+                pRecordData = pRecordData->pNext;
+            }
+            DnsRecordListFree(pRecord, DnsFreeRecordList);
+        }
+        DNS_BYTE_FLIP_HEADER_COUNTS(&pDNSMsgBuf->MessageHead);
+        return host;
+    }
+
+    bool DNS::FlushDNS()
+    {
+        auto hDll = ::LoadLibraryA("dnsapi");
+        if (!hDll)
+        {
+            return false;
+        }
+        bool isSuccess = false;
+        DNSFLUSHPROC pDNSFlushProc = (DNSFLUSHPROC)::GetProcAddress(hDll, "DnsFlushResolverCache");
+        if (pDNSFlushProc)
+        {
+            isSuccess = true;
+            auto ret = pDNSFlushProc();
+            isSuccess = true;
+        }
+        ::FreeLibrary(hDll);
+        return isSuccess;
+    }
+
+    bool DNS::NotifyIPChanged(const std::string& strAdapterName)
+    {
+        bool isSuccess = false;
+        HINSTANCE hDhcpDll;
+        DHCPNOTIFYPROC	pDhcpNotifyProc;
+        WCHAR wcAdapterName[256] = { 0 };
+        ::MultiByteToWideChar(CP_UTF8, 0, strAdapterName.c_str(), -1, wcAdapterName, 256);
+        if ((hDhcpDll = LoadLibraryA("dhcpcsvc")) == NULL)
+            return false;
+
+        if ((pDhcpNotifyProc = (DHCPNOTIFYPROC) GetProcAddress(hDhcpDll, "DhcpNotifyConfigChange")) != NULL)
+            if ((pDhcpNotifyProc) (NULL, wcAdapterName, FALSE, 0, NULL, NULL, 0) == ERROR_SUCCESS)
+                isSuccess = true;
+
+        FreeLibrary(hDhcpDll);
+        return isSuccess;
+    }
+
 
 }  // namespace Mona

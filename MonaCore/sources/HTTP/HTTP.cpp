@@ -212,6 +212,8 @@ HTTP::CommandType HTTP::ParseCommand(Exception& ex,const char* value) {
 		return COMMAND_OPTIONS;
 	if (String::ICompare(value,EXPAND("POST"))==0)
 		return COMMAND_POST;
+    if (String::ICompare(value,EXPAND("CONNECT"))==0)
+        return COMMAND_CONNECT;
 	ex.set(Exception::PROTOCOL, "Unknown HTTP command ", string(value, 4));
 	return COMMAND_UNKNOWN;
 }

@@ -16,25 +16,20 @@ details (or else see http://www.gnu.org/licenses/).
 This file is a part of Mona.
 */
 
-#pragma once
+#include "Mona/BlindlyProxy/Proxy.h"
+#include "Mona/Crypto.h"
 
-#include "Mona/Mona.h"
-#include "Mona/SocketAddress.h"
-#include "Mona/BinaryReader.h"
-#include "Mona/BinaryWriter.h"
-#include "Mona/Time.h"
-
+using namespace std;
 namespace Mona {
 
-class DNS : virtual Static {
-public:
-    static std::string GetHostFromPacket(const char* pBuf, size_t sz);
+bool Proxy::Unpack(BinaryReader& reader) {
+	reader.reset();
+    return false;
+}
 
-    static std::string GetResponseIPs(const char* pBuf, size_t sz);
-
-    static bool FlushDNS();
-
-    static bool NotifyIPChanged(const std::string& strAdapterName);
-};
+void Proxy::Pack(BinaryWriter& writer) {
+	/*BinaryReader reader(writer.data()+4,writer.size()-4);
+	BinaryWriter(writer.data(),4).write32(reader.read32()^reader.read32()^farId);*/
+}
 
 }  // namespace Mona

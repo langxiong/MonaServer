@@ -139,7 +139,7 @@ void Listener::seek(UInt32 time) {
 
 
 void Listener::pushData(DataReader& reader) {
-	/* TODO remplacer par un relay mode à imaginer et concevoir!
+	/* TODO remplacer par un relay mode ?imaginer et concevoir!
 	if(publication.publisher()) {
 		if(ICE::ProcessSDPPacket(reader,(Peer&)*publication.publisher(),publication.publisher()->writer(),(Peer&)client,*_pDataWriter))
 			return;

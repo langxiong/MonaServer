@@ -172,7 +172,9 @@ void HTTPSession::receive(const shared_ptr<HTTPPacket>& pPacket) {
 			//  HTTP OPTIONS (it is due requested when Move Redirection is sent)
 			else if (pPacket->command == HTTP::COMMAND_OPTIONS)
 				processOptions(ex, *pPacket);
-			else
+			else if (pPacket->command == HTTP::COMMAND_CONNECT)
+                processConnect(ex, *pPacket);
+            else
 				ex.set(Exception::PROTOCOL, "Unsupported command");
 		}
 	}
@@ -205,6 +207,18 @@ void HTTPSession::processOptions(Exception& ex,const HTTPPacket& request) {
 			HTTP_ADD_HEADER("Access-Control-Allow-Headers", request.accessControlRequestHeaders)
 		HTTP_ADD_HEADER("Access-Control-Max-Age", EXPAND("86400")) // max age of 24 hours
 	HTTP_END_HEADER
+}
+
+void HTTPSession::processConnect(Exception& ex, HTTPPacket& request)
+{
+    auto it = request.headers.find("Proxy-Connection");
+    if (it != request.headers.end())
+    {
+        request.headers["Connection"] = it->second;
+        request.headers.erase(it);
+    }
+    _writer.writeRaw("HTTP/1.0 200 Connection established");
+    
 }
 
 void HTTPSession::processGet(Exception& ex, HTTPPacket& request, QueryReader& parameters) {

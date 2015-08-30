@@ -93,7 +93,7 @@
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../External/include;../MonaBase/include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -209,6 +209,7 @@
     <ClInclude Include="include\Mona\Client.h" />
     <ClInclude Include="include\Mona\Decoder.h" />
     <ClInclude Include="include\Mona\DNS\DNS.h" />
+    <ClInclude Include="include\Mona\DNS\DNSHelper.h" />
     <ClInclude Include="include\Mona\DNS\DNSProtocol.h" />
     <ClInclude Include="include\Mona\DNS\DNSSession.h" />
     <ClInclude Include="include\Mona\FlashMainStream.h" />
@@ -294,6 +295,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sources\DNS\DNS.cpp" />
+    <ClCompile Include="sources\DNS\DNSHelper.cpp" />
     <ClCompile Include="sources\DNS\DNSProtocol.cpp" />
     <ClCompile Include="sources\DNS\DNSSession.cpp" />
     <ClCompile Include="sources\FlashMainStream.cpp" />

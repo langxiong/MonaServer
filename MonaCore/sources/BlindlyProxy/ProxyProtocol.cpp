@@ -16,36 +16,36 @@ details (or else see http://www.gnu.org/licenses/).
 This file is a part of Mona.
 */
 
-#include "Mona/DNS/DNSProtocol.h"
-#include "Mona/DNS/DNS.h"
-#include "Mona/DNS/DNSSession.h"
-#include "Mona/DNS/DNSHelper.h"
+#include "Mona/BlindlyProxy/ProxyProtocol.h"
+#include "Mona/BlindlyProxy/Proxy.h"
+#include "Mona/BlindlyProxy/TunnelSession.h"
 
 using namespace std;
 
+
 namespace Mona {
 
-DNSProtocol::DNSProtocol(const char* name, Invoker& invoker, Sessions& sessions) : UDProtocol(name, invoker, sessions), _pDNSHelper(new DNSHelper) {
+
+ProxyProtocol::ProxyProtocol(const char* name, Invoker& invoker, Sessions& sessions) : TCProtocol(name, invoker, sessions) {
 
 	// timesBeforeTurn, no by default
-
-	onPacket = [this](PoolBuffer& pBuffer,const SocketAddress& address) {
+    /*
+        onPacket = [this](PoolBuffer& pBuffer,const SocketAddress& address) {
         this->sessions.create<DNSSession>(*this, this->invoker, pBuffer, address);
-	};
+        };
 
-	OnPacket::subscribe(onPacket);
+        OnPacket::subscribe(onPacket);*/
 }
 
-DNSProtocol::~DNSProtocol() {
-	OnPacket::unsubscribe(onPacket);
+ProxyProtocol::~ProxyProtocol() {
+	// OnPacket::unsubscribe(onPacket);
 }
 
-bool DNSProtocol::load(Exception& ex, const SocketAddress& address) {
+bool ProxyProtocol::load(Exception& ex, const SocketAddress& address) {
 
-	if (!UDProtocol::load(ex,address))
+	if (!TCProtocol::load(ex,address))
 		return false;
-
-    return _pDNSHelper->ChangeDefaultAdpaterDNSSetting();
+	return true;
 }
 
 

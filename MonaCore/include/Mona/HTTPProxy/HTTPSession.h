@@ -47,9 +47,6 @@ private:
 	/// Note: It is called when processMove is used before a SOAP request
 	void			processOptions(Exception& ex,const HTTPPacket& request);
 
-    /// \brief Process Connection Command
-    void			processConnect(Exception& ex, HTTPPacket& request);
-
 	/// \brief Process GET & HEAD commands
 	/// Search for a method or a file whitch correspond to the _filePath
 	void			processGet(Exception& ex, HTTPPacket& request, QueryReader& parameters);

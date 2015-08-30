@@ -125,8 +125,7 @@ public:
 		COMMAND_PUSH = 4,
 		COMMAND_OPTIONS = 8,
 		COMMAND_POST = 16,
-		COMMAND_DELETE = 32,
-        COMMAND_CONNECT = 64
+		COMMAND_DELETE = 32
 	};
 
 	enum ContentType {

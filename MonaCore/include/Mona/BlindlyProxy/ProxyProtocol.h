@@ -19,22 +19,20 @@ This file is a part of Mona.
 #pragma once
 
 #include "Mona/Mona.h"
-#include "Mona/SocketAddress.h"
-#include "Mona/BinaryReader.h"
-#include "Mona/BinaryWriter.h"
-#include "Mona/Time.h"
+#include "Mona/TCProtocol.h"
 
 namespace Mona {
 
-class DNS : virtual Static {
+class ProxyProtocol : public TCProtocol, public virtual Object  {
 public:
-    static std::string GetHostFromPacket(const char* pBuf, size_t sz);
-
-    static std::string GetResponseIPs(const char* pBuf, size_t sz);
-
-    static bool FlushDNS();
-
-    static bool NotifyIPChanged(const std::string& strAdapterName);
+	ProxyProtocol(const char* name, Invoker& invoker, Sessions& sessions);
+    ~ProxyProtocol();
+	
+	bool		load(Exception& ex,const SocketAddress& address);
+private:
+	void		manage() {; }
+    // TCProtocol::OnPacket::Type onPacket;
 };
 
-}  // namespace Mona
+
+} // namespace Mona

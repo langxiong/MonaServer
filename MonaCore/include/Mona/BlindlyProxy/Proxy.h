@@ -23,18 +23,14 @@ This file is a part of Mona.
 #include "Mona/BinaryReader.h"
 #include "Mona/BinaryWriter.h"
 #include "Mona/Time.h"
+#include <openssl/evp.h>
 
 namespace Mona {
 
-class DNS : virtual Static {
+class Proxy : virtual Static {
 public:
-    static std::string GetHostFromPacket(const char* pBuf, size_t sz);
-
-    static std::string GetResponseIPs(const char* pBuf, size_t sz);
-
-    static bool FlushDNS();
-
-    static bool NotifyIPChanged(const std::string& strAdapterName);
+    static bool	Unpack(BinaryReader& reader);
+    static void	Pack(BinaryWriter& writer);
 };
 
 }  // namespace Mona

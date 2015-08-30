@@ -16,25 +16,28 @@ details (or else see http://www.gnu.org/licenses/).
 This file is a part of Mona.
 */
 
-#pragma once
+#include "Mona/BlindlyProxy/TunnelSession.h"
 
-#include "Mona/Mona.h"
-#include "Mona/SocketAddress.h"
-#include "Mona/BinaryReader.h"
-#include "Mona/BinaryWriter.h"
-#include "Mona/Time.h"
+using namespace std;
 
 namespace Mona {
 
-class DNS : virtual Static {
-public:
-    static std::string GetHostFromPacket(const char* pBuf, size_t sz);
+TunnelSession::TunnelSession(ProxyProtocol& protocol,
+    Invoker& invoker, PoolBuffer& pBuffer, const SocketAddress& peerAddress) : Session(protocol, invoker, "Tunnel:Resovler")
+{
+    {
+       /* _onTunnelEstablish = [this](PoolBuffer& poolBuffer, const SocketAddress& addr)
+        {
 
-    static std::string GetResponseIPs(const char* pBuf, size_t sz);
+        };*/
+    }
+    Exception e;
+   // _socket.connect(e, peerAddress);
+}
 
-    static bool FlushDNS();
+void TunnelSession::kill(UInt32 type /*= NORMAL_DEATH*/)
+{
+    Session::kill(type);
+}
 
-    static bool NotifyIPChanged(const std::string& strAdapterName);
-};
-
-}  // namespace Mona
+} // namespace Mona

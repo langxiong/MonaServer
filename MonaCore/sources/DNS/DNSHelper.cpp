@@ -17,14 +17,18 @@
 #include "Mona/Logs.h"
 #include "Mona/DNS/DNS.h"
 
+#include <fstream>
+
 #pragma comment(lib, "Iphlpapi.lib")
 
 namespace Mona
 {
-	DNSHelper::DNSHelper():
-		m_pFixInfo(NULL)
+    DNSHelper::DNSHelper(const std::string& blockListFilePath) :
+		m_pFixInfo(NULL),
+        m_blockListFilePath(blockListFilePath)
 	{
 		Init();
+        ResetDefaultAdapterDNSSetting();
 	}
 
 	DNSHelper::~DNSHelper()
@@ -76,6 +80,18 @@ namespace Mona
 			}
 		}
 		GetAdapterInfos();
+
+        std::fstream blockListF(m_blockListFilePath, std::ios_base::in);
+        if (!blockListF)
+        {
+            ERROR("failed to read block list file ", m_blockListFilePath);
+            return;
+        }
+        std::string blockDomain;
+        while (std::getline(blockListF, blockDomain))
+        {
+            m_blockList.push_back(blockDomain);
+        }
 	}
 
 	const FIXED_INFO* DNSHelper::GetFixedInfo() const
@@ -181,10 +197,23 @@ namespace Mona
 		return false;
 	}
 
-	const std::vector<std::string>& DNSHelper::GetDefaultDNSServers() const
-	{
-		return m_DNSServers;
-	}
+    std::string DNSHelper::GetDNSServerAddress(const std::string& host) const
+    {
+        if (m_DNSServers.empty() || m_DNSServers.front() == "127.0.0.1")
+        {
+            return "8.8.8.8";
+        }
+        else if (IsBlockHost(host))
+        {
+            return "8.8.8.8";
+        }
+        return m_DNSServers.front();
+    }
+
+    bool DNSHelper::IsBlockHost(const std::string& host) const
+    {
+        return std::find(m_blockList.begin(), m_blockList.end(), host) != m_blockList.end();
+    }
 
 	const std::string DNSHelper::sm_RootKey("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces\\");
 

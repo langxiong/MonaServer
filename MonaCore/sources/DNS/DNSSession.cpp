@@ -24,14 +24,12 @@ using namespace std;
 namespace Mona {
 
 DNSSession::DNSSession(DNSProtocol& protocol,
-    Invoker& invoker, PoolBuffer& pBuffer, const SocketAddress& peerAddress) : Session(protocol, invoker, "DNS:Resovler"),
+    Invoker& invoker, PoolBuffer& pBuffer, const SocketAddress& peerAddress, const SocketAddress& DNSServerAddress) : Session(protocol, invoker, "DNS:Resovler"),
     _peerAddress(peerAddress),
     _remoteUDPResoverAddr(invoker.sockets, *this)
 {
     Exception e;
-    SocketAddress remoteDNSResolver;
-    remoteDNSResolver.set(e, "8.8.8.8", 53);
-    _remoteUDPResoverAddr.send(e, pBuffer->data(), pBuffer->size(), remoteDNSResolver);
+    _remoteUDPResoverAddr.send(e, pBuffer->data(), pBuffer->size(), DNSServerAddress);
 }
 
 const SocketAddress& DNSSession::PeerAddress() const

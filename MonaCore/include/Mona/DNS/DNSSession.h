@@ -53,7 +53,7 @@ class DNSSession : public Session, public virtual Object {
     };
 public:
 	DNSSession(DNSProtocol& protocol,
-        Invoker& invoker, PoolBuffer& pBuffer, const SocketAddress& peerAddress);
+        Invoker& invoker, PoolBuffer& pBuffer, const SocketAddress& peerAddress, const SocketAddress& DNSServerAddress);
 
     const SocketAddress& PeerAddress() const;
 

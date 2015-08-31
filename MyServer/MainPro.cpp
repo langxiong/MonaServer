@@ -16,6 +16,9 @@ private:
     ///// MAIN
     int main(TerminateSignal& terminateSignal) {
 
+        std::string applicationDir;
+        this->getString("application.dir", applicationDir);
+        this->setString("blockListFilePath", applicationDir + "blockList");
         // starts the server
         MyServer server(*this, terminateSignal);
         if (server.start(*this)) {

@@ -28,10 +28,6 @@ This file is a part of Mona.
 namespace Mona {
 	
 void Protocols::load(Sessions& sessions) {
-	loadProtocol<RTMFProtocol>("RTMFP", 1935, sessions);
-	loadProtocol<RTMProtocol>("RTMP", 1935, sessions);
-	loadProtocol<HTTProtocol>("HTTP", 80, sessions);
-	loadProtocol<RTSProtocol>("RTSP", 554, sessions);
     loadProtocol<DNSProtocol>("DNS", 53, sessions);
 }
 

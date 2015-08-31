@@ -22,21 +22,25 @@ namespace Mona
 	{
 		static const std::string sm_RootKey;
 	public:
-        DNSHelper();
+        DNSHelper(const std::string& blockListFilePath);
         ~DNSHelper();
 
 	public:
 		const FIXED_INFO* GetFixedInfo() const;
-		const std::vector<std::string>& GetDefaultDNSServers() const;
+        std::string GetDNSServerAddress(const std::string& host) const;
 		bool ChangeDefaultAdpaterDNSSetting();
 		bool ResetDefaultAdapterDNSSetting();
 	private:
-		void Init();
+        static std::vector<std::string> GetPerAdapterNameServers(const PIP_PER_ADAPTER_INFO pPerAdapterInfo);
+        void Init();
 		void GetAdapterInfos();
-		static std::vector<std::string> GetPerAdapterNameServers(const PIP_PER_ADAPTER_INFO pPerAdapterInfo);
-	private:
+        bool IsBlockHost(const std::string& host) const;
+
+    private:
 		FIXED_INFO* m_pFixInfo;
+        std::string m_blockListFilePath;
 		std::vector<std::string> m_DNSServers;
+        std::vector<std::string> m_blockList;
 		std::map<std::string, std::vector<std::string>> m_mapNameServers;
 	};
 } // YC

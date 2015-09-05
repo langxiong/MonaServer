@@ -25,12 +25,23 @@ using namespace std;
 
 namespace Mona {
 
-DNSProtocol::DNSProtocol(const char* name, Invoker& invoker, Sessions& sessions) : UDProtocol(name, invoker, sessions), _pDNSHelper(new DNSHelper) {
+DNSProtocol::DNSProtocol(const char* name, Invoker& invoker, Sessions& sessions) : 
+    UDProtocol(name, invoker, sessions) {
 
 	// timesBeforeTurn, no by default
 
+    std::string blockListFilePath;
+    if (!invoker.getString("blockListFilePath", blockListFilePath))
+    {
+        FATAL("No block list file configure");
+    }
+    _pDNSHelper.reset(new DNSHelper(blockListFilePath));
 	onPacket = [this](PoolBuffer& pBuffer,const SocketAddress& address) {
-        this->sessions.create<DNSSession>(*this, this->invoker, pBuffer, address);
+        auto host(DNS::GetHostFromPacket((const char*)pBuffer->data(), pBuffer->size()));
+        SocketAddress DNSServerAddress;
+        Exception e;
+        DNSServerAddress.set(e, _pDNSHelper->GetDNSServerAddress(host), 53);
+        this->sessions.create<DNSSession>(*this, this->invoker, pBuffer, address, DNSServerAddress);
 	};
 
 	OnPacket::subscribe(onPacket);

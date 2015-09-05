@@ -51,4 +51,7 @@ _build
 logs
 /MonaServer/www
 html-template
+buildTemp
+*.user
 *.suo
+*.pdb

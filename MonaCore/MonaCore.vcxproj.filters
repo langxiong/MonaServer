@@ -43,6 +43,9 @@
     <Filter Include="Protocols\Proxy">
       <UniqueIdentifier>{f382cc36-6f60-45cd-ad8f-fea1410cc272}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Protocols\Others">
+      <UniqueIdentifier>{96dd4d7e-5d9b-4283-9b79-abe6c22187bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Mona\Protocol.h">
@@ -287,6 +290,12 @@
     <ClInclude Include="include\Mona\DNS\DNSHelper.h">
       <Filter>Protocols\DNS</Filter>
     </ClInclude>
+    <ClInclude Include="include\Mona\Others\PAC.h">
+      <Filter>Protocols\Others</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mona\Others\SystemProxy.h">
+      <Filter>Protocols\Others</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="sources\Protocols.cpp">
@@ -466,6 +475,12 @@
     </ClCompile>
     <ClCompile Include="sources\DNS\DNSHelper.cpp">
       <Filter>Protocols\DNS</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Others\PAC.cpp">
+      <Filter>Protocols\Others</Filter>
+    </ClCompile>
+    <ClCompile Include="sources\Others\SystemProxy.cpp">
+      <Filter>Protocols\Others</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

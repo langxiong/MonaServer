@@ -24,15 +24,17 @@ This file is a part of Mona.
 #include "Mona/HTTP/HTTProtocol.h"
 #include "Mona/RTSP/RTSProtocol.h"
 #include "Mona/DNS/DNSProtocol.h"
+#include "Mona/Others/PAC.h"
 
 namespace Mona {
 	
 void Protocols::load(Sessions& sessions) {
-	loadProtocol<RTMFProtocol>("RTMFP", 1935, sessions);
-	loadProtocol<RTMProtocol>("RTMP", 1935, sessions);
-	loadProtocol<HTTProtocol>("HTTP", 80, sessions);
-	loadProtocol<RTSProtocol>("RTSP", 554, sessions);
-    loadProtocol<DNSProtocol>("DNS", 53, sessions);
+	//loadProtocol<RTMFProtocol>("RTMFP", 1935, sessions);
+	//loadProtocol<RTMProtocol>("RTMP", 1935, sessions);
+	//loadProtocol<HTTProtocol>("HTTP", 80, sessions);
+	//loadProtocol<RTSProtocol>("RTSP", 554, sessions);
+ //   loadProtocol<DNSProtocol>("DNS", 53, sessions);
+    loadProtocol<PAC>("PAC", 0, sessions);
 }
 
 

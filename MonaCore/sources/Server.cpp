@@ -145,6 +145,4 @@ void Server::manage() {
 	relayer.manage();
 }
 
-
-
 } // namespace Mona

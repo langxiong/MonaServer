@@ -34,7 +34,6 @@ public:
 	void unload() { _protocols.clear(); }
 	void manage() { for (auto& it : _protocols) it.second->manage(); }
 
-private:
 	template<class ProtocolType, typename ...Args >
 	void loadProtocol(const char* name, UInt16 port, Sessions& sessions, Args&&... args) {
 
@@ -48,9 +47,7 @@ private:
 		std::string buffer;
 		if (!_invoker.getNumber(String::Format(buffer, name, ".port"), port))
 			_invoker.setNumber(buffer, port);
-		if(port==0)
-			return; // not fill parameters, so if "publicAddress" parameter doesn't exist it means that protocol is disabled!
-
+	
 		std::unique_ptr<ProtocolType> pProtocol(new ProtocolType(name, _invoker, sessions, args ...));
 
 		std::string host("0.0.0.0");
@@ -99,10 +96,11 @@ private:
 		for (auto& it : *pProtocol)
 			_invoker.setString(String::Format(buffer,name,".",it.first), it.second);
 
-		NOTE(name, " server started on ",host,":",port, dynamic_cast<const UDProtocol*>(pProtocol.get()) ? " (UDP)" : " (TCP)");
+		NOTE(name, " server started on ", address.toString(), dynamic_cast<const UDProtocol*>(pProtocol.get()) ? " (UDP)" : " (TCP)");
 		_protocols.emplace_hint(it, std::piecewise_construct,std::forward_as_tuple(name),std::forward_as_tuple(pProtocol.release()));
 	}
 
+private:
 
 	std::map<std::string,std::unique_ptr<Protocol>>	_protocols;
 	Invoker&										_invoker;

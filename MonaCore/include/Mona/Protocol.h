@@ -43,7 +43,7 @@ protected:
 	Sessions&		sessions;
 
 private:
-	bool	load(Exception& ex,const SocketAddress& address) { return true; }
+	bool load(Exception& ex,SocketAddress& address) { return true; }
 };
 
 inline bool Protocol::auth(const SocketAddress& address) {

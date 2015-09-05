@@ -29,7 +29,7 @@ public:
 	DNSProtocol(const char* name, Invoker& invoker, Sessions& sessions);
     ~DNSProtocol();
 	
-	bool        load(Exception& ex,const SocketAddress& address);
+	bool load(Exception& ex,SocketAddress& address);
 private:
 	void		manage() {; }
 private:

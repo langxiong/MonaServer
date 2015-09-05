@@ -40,7 +40,7 @@ DNSProtocol::~DNSProtocol() {
 	OnPacket::unsubscribe(onPacket);
 }
 
-bool DNSProtocol::load(Exception& ex, const SocketAddress& address) {
+bool DNSProtocol::load(Exception& ex, SocketAddress& address) {
 
 	if (!UDProtocol::load(ex,address))
 		return false;

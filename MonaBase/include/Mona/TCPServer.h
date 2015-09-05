@@ -43,7 +43,7 @@ public:
 	// safe-threading
 	SocketAddress&			address(SocketAddress& address) const { std::lock_guard<std::mutex> lock(_mutex);  return address=_address; }
 
-	bool					start(Exception& ex, const SocketAddress& address);
+	bool start(Exception& ex, SocketAddress& address);
 	bool					running() { return _running;  }
 	void					stop();
 

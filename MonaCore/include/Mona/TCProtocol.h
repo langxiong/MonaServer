@@ -32,7 +32,7 @@ class TCProtocol : public Protocol , public virtual Object,
 	public Events::OnError {
 public:
 
-	bool load(Exception& ex, const SocketAddress& address) {
+	bool load(Exception& ex, SocketAddress& address) {
 		if (!hasKey("timeout"))
 			WARN("Protocol ", name, " has no TCP connection timeout");
 		return _server.start(ex, address);

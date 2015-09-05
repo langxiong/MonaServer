@@ -46,7 +46,7 @@ TCPServer::~TCPServer() {
 		_socket.close();
 }
 
-bool TCPServer::start(Exception& ex,const SocketAddress& address) {
+bool TCPServer::start(Exception& ex,SocketAddress& address) {
 	lock_guard<mutex> lock(_mutex);
 	if (_running) {
 		if (address == _address)
@@ -57,6 +57,7 @@ bool TCPServer::start(Exception& ex,const SocketAddress& address) {
 	if (!_socket.bindWithListen(ex, address))
 		return false;
 	_socket.address(ex, _address); // not assign address to _address because if address.port()==0 it has choose a random port!
+    address.set(_address);
 	return _running=true;
 }
 

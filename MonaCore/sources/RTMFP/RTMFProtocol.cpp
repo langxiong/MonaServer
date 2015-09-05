@@ -61,7 +61,7 @@ RTMFProtocol::~RTMFProtocol() {
 	OnPacket::unsubscribe(onPacket);
 }
 
-bool RTMFProtocol::load(Exception& ex,const SocketAddress& address) {
+bool RTMFProtocol::load(Exception& ex,SocketAddress& address) {
 
 	if (!UDProtocol::load(ex,address))
 		return false;

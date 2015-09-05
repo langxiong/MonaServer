@@ -30,7 +30,7 @@ class UDProtocol : public Protocol, public virtual Object,
 	public Events::OnPacket,
 	public Events::OnError {
 public:
-	bool load(Exception& ex, const SocketAddress& address) {
+	bool load(Exception& ex, SocketAddress& address) {
 		return _socket.bind(ex, address);
 	}
 

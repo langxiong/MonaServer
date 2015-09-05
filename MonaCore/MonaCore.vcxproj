@@ -223,6 +223,8 @@
     <ClInclude Include="include\Mona\MediaCodec.h" />
     <ClInclude Include="include\Mona\MediaContainer.h" />
     <ClInclude Include="include\Mona\MIME.h" />
+    <ClInclude Include="include\Mona\Others\PAC.h" />
+    <ClInclude Include="include\Mona\Others\SystemProxy.h" />
     <ClInclude Include="include\Mona\ParameterWriter.h" />
     <ClInclude Include="include\Mona\Peer.h" />
     <ClInclude Include="include\Mona\QueryReader.h" />
@@ -306,6 +308,8 @@
     <ClCompile Include="sources\Invoker.cpp" />
     <ClCompile Include="sources\MediaContainer.cpp" />
     <ClCompile Include="sources\MIME.cpp" />
+    <ClCompile Include="sources\Others\PAC.cpp" />
+    <ClCompile Include="sources\Others\SystemProxy.cpp" />
     <ClCompile Include="sources\Peer.cpp" />
     <ClCompile Include="sources\QueryReader.cpp" />
     <ClCompile Include="sources\QueryWriter.cpp" />

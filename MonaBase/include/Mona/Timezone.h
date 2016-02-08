@@ -26,6 +26,9 @@ This file is a part of Mona.
 
 #if defined(_WIN32)
 struct _SYSTEMTIME;
+
+#undef ABSOLUTE
+#undef RELATIVE
 #endif
 
 namespace Mona {

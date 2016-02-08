@@ -34,7 +34,7 @@ public:
 };
 
 static PoolBuffers	poolBuffers;
-static Database		data(poolBuffers);
+static Database		s_data(poolBuffers);
 static string		path;
 static Loader		loader;
 
@@ -43,19 +43,19 @@ ADD_TEST(DatabaseTest, Load) {
 	Exception ex;
 	CHECK(FileSystem::GetHome(path));
 	path.append(".MonaDatabaseTests");
-	data.load(ex, path, loader);
+	s_data.load(ex, path, loader);
 	CHECK(!ex);
 }
 
 
 ADD_TEST(DatabaseTest, Add) {
 	Exception ex;
-	CHECK(data.add(ex, "", (const UInt8*)"salut", 5));
-	CHECK(data.add(ex, "Test", (const UInt8*)"aurevoir", 8));
-	CHECK(data.add(ex, "Test", (const UInt8*)"aur\0voir", 8));
+	CHECK(s_data.add(ex, "", (const UInt8*)"salut", 5));
+	CHECK(s_data.add(ex, "Test", (const UInt8*)"aurevoir", 8));
+	CHECK(s_data.add(ex, "Test", (const UInt8*)"aur\0voir", 8));
 	CHECK(!ex);
 
-	data.flush();
+	s_data.flush();
 	CHECK(FileSystem::Exists(path+"/"));
 	CHECK(FileSystem::Exists(path + "/Test/"));
 }
@@ -63,18 +63,18 @@ ADD_TEST(DatabaseTest, Add) {
 ADD_TEST(DatabaseTest, Reload) {
 	// create base of test
 	Exception ex;
-	data.load(ex,path,loader);
+	s_data.load(ex,path,loader);
 	CHECK(!ex);
 }
 
 ADD_TEST(DatabaseTest, Remove) {
 	// create base of test
 	Exception ex;
-	CHECK(data.remove(ex, "/Test/NoExists"));
-	CHECK(data.remove(ex, ""));
+	CHECK(s_data.remove(ex, "/Test/NoExists"));
+	CHECK(s_data.remove(ex, ""));
 	CHECK(!ex);
 
-	data.flush();
+	s_data.flush();
 	CHECK(!FileSystem::Exists(path + "/"));
 }
 

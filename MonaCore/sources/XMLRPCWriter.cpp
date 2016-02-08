@@ -73,7 +73,7 @@ void XMLRPCWriter::endArray() {
 }
 
 void XMLRPCWriter::writeNumber(double value) {
-	if (round(value) == value && value <= numeric_limits<int>::max() && value >= numeric_limits<int>::min())
+	if (round(value) == value && value <= numeric_limits<int>::max() && value >= INT_MIN)
 		return writeInt((int)value);
 	String::Append(beginValue("double"), value);
 	endValue("double");

@@ -30,8 +30,6 @@ This file is a part of Mona.
    extern char *tzname[2];
 #endif
 
-#undef ABSOLUTE
-#undef RELATIVE
 
 using namespace std;
 

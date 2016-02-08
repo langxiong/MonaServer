@@ -25,6 +25,10 @@ This file is a part of Mona.
 #include <string>
 #include <cstring>
 #include <complex>
+#if defined(_MSC_VER)
+#include <WinSock2.h>
+#include <windows.h>
+#endif // if defined(_MSC_VER)
 
 /////  Usefull macros and patchs   //////
 

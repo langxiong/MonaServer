@@ -21,6 +21,7 @@ This file is a part of Mona.
 #include "Mona/Exceptions.h"
 #include <limits>
 #include <cctype>
+#include <stdio.h>
 
 #if defined(_WIN32)
     #include "windows.h"
@@ -31,11 +32,6 @@ using namespace std;
 namespace Mona {
 
 const string String::Empty;
-
-#if defined(_WIN32)
-	 // for setting number of exponent digits to 2
-	static int output_exp_old_format(_set_output_format(_TWO_DIGIT_EXPONENT));
-#endif
 
 size_t String::Split(const char* value, const char* separators, const String::ForEach& forEach, int options) {
 	const char* it1(value);
